@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aktiengewinne</title>
+<style>
+:root{--bg:#eceff0;--card:#fbfcfc;--tx:#14232b;--mu:#5d6c73;--ln:#d3dbde;--ac:#0f5c63;--bt:#fff;--ok:#1d7a46;--bad:#b3261e;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1f;--card:#17262c;--tx:#e4ecee;--mu:#8ea1a8;--ln:#2a3d45;--ac:#5cc2c9;--bt:#07272a;--ok:#58c987;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a1f;--card:#17262c;--tx:#e4ecee;--mu:#8ea1a8;--ln:#2a3d45;--ac:#5cc2c9;--bt:#07272a;--ok:#58c987;--bad:#ff8a80;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{max-width:720px;margin:0 auto;padding:14px}
+h1,h2{font-family:Georgia,"Iowan Old Style",serif;font-weight:600}
+h1{font-size:24px;margin:6px 0 12px}h2{font-size:17px;margin:20px 0 8px}
+.c{background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:12px;margin:8px 0}
+.mu,.k{color:var(--mu);font-size:13px}
+.v{font-family:Georgia,serif;font-size:17px;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto}
+button,input,select,textarea{font:inherit;color:var(--tx)}
+button{background:var(--ac);color:var(--bt);border:0;border-radius:8px;padding:10px 14px;margin-top:4px}
+button.s,.tabs button{background:var(--card);color:var(--tx);border:1px solid var(--ln)}
+.tabs button{padding:8px 12px;white-space:nowrap;margin:0}
+.tabs button.on{background:var(--ac);color:var(--bt);border-color:var(--ac)}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:10px;margin:3px 0 8px}
+label{font-size:13px;color:var(--mu)}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
+.p{color:var(--ok)}.n{color:var(--bad)}
+.w{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 4px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}
+th{color:var(--mu);font-weight:400}th:first-child,td:first-child{text-align:left}
+a{color:var(--ac)}
+</style></head><body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),K="aktien_v1",v=i=>$("#"+i).value;
+let S=null,key=null,salt=null,tab="ov",timer,hid=0;
+const te=new TextEncoder(),td=new TextDecoder();
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))),ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const ld=()=>{try{return localStorage.getItem(K)}catch(e){return null}};
+async function derive(p,s){const m=await crypto.subtle.importKey("raw",te.encode(p),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:300000,hash:"SHA-256"},m,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function seal(k,s,o){const iv=crypto.getRandomValues(new Uint8Array(12));const c=await crypto.subtle.encrypt({name:"AES-GCM",iv},k,te.encode(JSON.stringify(o)));return JSON.stringify({v:1,s:b64(s),i:b64(iv),d:b64(c)})}
+async function open(k,blob){const o=JSON.parse(blob);return JSON.parse(td.decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(o.i)},k,ub(o.d))))}
+async function save(){try{localStorage.setItem(K,await seal(key,salt,S))}catch(e){msg("Speichern nicht möglich.")}}
+function msg(t){const m=$("#m");if(m)m.textContent=t}
+function lock(){S=null;key=null;R()}
+function touch(){clearTimeout(timer);timer=setTimeout(lock,300000)}
+["click","keydown","touchstart"].forEach(e=>addEventListener(e,()=>{if(S)touch()},{passive:true}));
+document.addEventListener("visibilitychange",()=>{if(document.hidden)hid=Date.now();else if(S&&Date.now()-hid>60000)lock()});
+
+const num=x=>parseFloat(String(x).replace(",",".")),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const f=n=>(Math.abs(n)<.005?0:n).toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+const nf=n=>String(n).replace(".",","),D=d=>d.split("-").reverse().join("."),cl=n=>n>=0?"p":"n";
+const today=()=>new Date().toISOString().slice(0,10),days=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/864e5);
+const H=d=>d<100?Math.round(d)+" Tage":d<730?Math.round(d/30.44)+" Mon.":(d/365.25).toFixed(1).replace(".",",")+" Jahre";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sm=(a,k)=>a.reduce((x,r)=>x+r[k],0);
+
+function C(){
+ const ev=[...S.buys.map(b=>({...b,t:"b"})),...S.sells.map(s=>({...s,t:"s"}))].sort((a,b)=>a.date.localeCompare(b.date)||(a.t==b.t?0:a.t=="b"?-1:1));
+ const lots={},res=[];
+ for(const e of ev){const L=lots[e.stock]=lots[e.stock]||[];
+  if(e.t=="b"){L.push({d:e.date,q:e.qty,c:e.total/e.qty});continue}
+  let need=e.qty,cost=0,dd=0;
+  while(need>1e-9&&L.length){const l=L[0],q=Math.min(l.q,need);cost+=q*l.c;dd+=q*days(l.d,e.date);l.q-=q;need-=q;if(l.q<=1e-9)L.shift()}
+  const gross=e.qty*e.price-cost;
+  res.push({...e,cost,gross,net0:gross-e.fee,hold:dd/e.qty,over:need>1e-9})}
+ const k=(+S.set.church||0)/100,rate=.25/(1+.25*k)*(1.055+k);
+ let carry=+S.set.carry||0;
+ for(const y of [...new Set(res.map(r=>r.date.slice(0,4)))].sort()){
+  const al=S.set.al[y]!=null?+S.set.al[y]:1000;let run=-carry,pt=0;
+  for(const r of res.filter(r=>r.date.slice(0,4)==y)){run+=r.net0;const cu=Math.max(0,run-al)*rate;r.tc=cu-pt;pt=cu}
+  carry=Math.max(0,-run)}
+ for(const r of res){r.tax=r.tx!=null?r.tx:r.tc;r.after=r.net0-r.tax}
+ return{res,lots}}
+
+function lockHTML(){const h=ld(),K2='onkeydown="if(event.keyCode==13)go()"';
+ return `<h1>Aktiengewinne</h1><div class="c"><label>${h?"Code eingeben":"Code festlegen (mindestens 6 Zeichen)"}</label><input id="pw" type="password" autocomplete="off" ${K2}>${h?"":`<label>Code wiederholen</label><input id="pw2" type="password" ${K2}>`}<button onclick="go()">${h?"Entsperren":"Code festlegen"}</button><div id="m" class="n"></div><p class="mu">Die Daten liegen verschlüsselt nur auf diesem Gerät. Ohne den Code ist keine Wiederherstellung möglich – sichere deshalb regelmäßig einen Export.</p></div>${h?`<p class="mu"><a href="#" onclick="return rs(this)">Alle Daten zurücksetzen</a></p>`:""}`}
+function rs(a){if(!a.dataset.c){a.dataset.c=1;a.textContent="Wirklich alles löschen? Nochmal tippen.";return false}try{localStorage.removeItem(K)}catch(e){}S=null;key=null;R();return false}
+async function go(){const h=ld(),p=v("pw");
+ try{
+  if(!h){if(p.length<6)return msg("Der Code braucht mindestens 6 Zeichen.");if(p!==v("pw2"))return msg("Die Codes stimmen nicht überein.");
+   salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(p,salt);S={buys:[],sells:[],set:{church:0,al:{},carry:0}};await save()}
+  else{const o=JSON.parse(h);salt=ub(o.s);const k=await derive(p,salt);try{S=await open(k,h);key=k}catch(e){return msg("Falscher Code.")}}
+ }catch(e){return msg("Verschlüsselung nicht verfügbar. Öffne die Seite über https.")}
+ tab="ov";touch();R()}
+
+function R(){const a=$("#app");if(!S){a.innerHTML=lockHTML();return}
+ a.innerHTML=`<h1>Aktiengewinne</h1><div class="tabs">${[["ov","Übersicht"],["sl","Verkauf"],["by","Kauf"],["st","Einstellungen"]].map(([k,t])=>`<button class="${tab==k?"on":""}" onclick="tab='${k}';R()">${t}</button>`).join("")}</div>`+({ov:vOv,sl:vSl,by:vBy,st:vSt})[tab]()}
+
+function chart(res){if(res.length<2)return"";let g=0,n=0;const P=res.map(r=>(g+=r.gross,n+=r.after,[g,n])),t=res.map(r=>Date.parse(r.date)),t0=t[0],t1=t[t.length-1],all=P.flat().concat(0),mn=Math.min(...all),mx=Math.max(...all);
+ const X=i=>t1>t0?8+(t[i]-t0)/(t1-t0)*324:8+i/(res.length-1)*324,Y=y=>mx>mn?142-(y-mn)/(mx-mn)*134:75,pl=j=>P.map((p,i)=>X(i).toFixed(1)+","+Y(p[j]).toFixed(1)).join(" ");
+ return `<div class="c"><div class="k">Kumulierter Gewinn seit ${D(res[0].date)}</div><svg viewBox="0 0 340 150" width="100%" role="img" aria-label="Kumulierter Gewinn"><line x1="8" x2="332" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--ln)" stroke-dasharray="4 3"/><polyline points="${pl(0)}" fill="none" stroke="var(--ac)" stroke-width="2"/><polyline points="${pl(1)}" fill="none" stroke="var(--ok)" stroke-width="2"/></svg><div class="k"><span style="color:var(--ac)">▬</span> brutto &nbsp; <span style="color:var(--ok)">▬</span> netto nach Steuern &nbsp; Stand: ${f(g)} / ${f(n)}</div></div>`}
+
+function vOv(){const{res,lots}=C();
+ if(!res.length&&!S.buys.length)return`<div class="c">Noch keine Einträge. Erfasse zuerst einen Kauf, danach den Verkauf.</div>`;
+ const yr={};res.forEach(r=>{const y=r.date.slice(0,4);(yr[y]=yr[y]||[]).push(r)});
+ const names=[...new Set(S.buys.map(b=>b.stock).concat(res.map(r=>r.stock)))].sort();
+ return `<div class="c"><div class="g"><div><div class="k">Brutto-Gewinn</div><div class="v ${cl(sm(res,"gross"))}">${f(sm(res,"gross"))}</div></div><div><div class="k">Gebühren (Verkauf)</div><div class="v">${f(sm(res,"fee"))}</div></div><div><div class="k">Steuern</div><div class="v">${f(sm(res,"tax"))}</div></div><div><div class="k">Netto</div><div class="v ${cl(sm(res,"after"))}">${f(sm(res,"after"))}</div></div></div></div>`
+ +chart(res)
+ +(res.length?`<h2>Je Jahr</h2><div class="c w"><table><tr><th>Jahr</th><th>Brutto</th><th>Steuer</th><th>Netto</th></tr>${Object.keys(yr).sort().map(y=>`<tr><td>${y}</td><td class="${cl(sm(yr[y],"gross"))}">${f(sm(yr[y],"gross"))}</td><td>${f(sm(yr[y],"tax"))}</td><td class="${cl(sm(yr[y],"after"))}">${f(sm(yr[y],"after"))}</td></tr>`).join("")}</table></div>`:"")
+ +`<h2>Je Aktie</h2><div class="c w"><table><tr><th>Aktie</th><th>Seit</th><th>Offen</th><th>Ø Einstand</th><th>Brutto real.</th></tr>${names.map(n=>{const L=lots[n]||[],q=sm(L,"q"),ac=q>1e-9?L.reduce((x,l)=>x+l.q*l.c,0)/q:0,first=S.buys.filter(b=>b.stock==n).map(b=>b.date).sort()[0],g=sm(res.filter(r=>r.stock==n),"gross");
+  return`<tr><td>${esc(n)}</td><td>${first?D(first):"–"}</td><td>${q>1e-9?nf(+q.toFixed(4)):"–"}</td><td>${q>1e-9?f(ac):"–"}</td><td class="${cl(g)}">${res.some(r=>r.stock==n)?f(g):"–"}</td></tr>`}).join("")}</table></div>`}
+
+const dl=()=>`<datalist id="nl">${[...new Set(S.buys.map(b=>b.stock))].map(n=>`<option value="${esc(n)}">`).join("")}</datalist>`;
+function vSl(){const{res}=C();
+ return `<div class="c"><h2 style="margin-top:0">Verkauf erfassen</h2><label>Aktie</label><input id="sn" list="nl">${dl()}<label>Verkaufsdatum</label><input id="sd" type="date" value="${today()}"><div class="g"><div><label>Stück</label><input id="sq" inputmode="decimal"></div><div><label>Kurs (€)</label><input id="sp" inputmode="decimal"></div><div><label>Gebühr (€)</label><input id="sf" inputmode="decimal"></div></div><label>Steuer abweichend (optional, leer = berechnet)</label><input id="sx" inputmode="decimal"><button onclick="addSl()">Verkauf speichern</button><div id="m" class="n"></div></div>`
+ +(res.length?[...res].reverse().map(r=>`<div class="c"><b>${esc(r.stock)}</b> <span class="mu">${D(r.date)}, ${nf(r.qty)} Stk. zu ${f(r.price)}</span>${r.over?`<div class="n">Mehr verkauft als im Bestand. Prüfe die Käufe.</div>`:""}<div class="g" style="margin-top:8px"><div><div class="k">Brutto</div><div class="v ${cl(r.gross)}">${f(r.gross)}</div></div><div><div class="k">Haltedauer</div><div class="v">${H(r.hold)}</div></div><div><div class="k">Steuer</div><div class="v">${f(r.tax)}</div></div><div><div class="k">Netto</div><div class="v ${cl(r.after)}">${f(r.after)}</div></div></div><label style="display:block;margin-top:8px">Steuer überschreiben (berechnet: ${f(r.tc)})</label><input inputmode="decimal" value="${r.tx==null?"":nf(r.tx)}" onchange="ov('${r.id}',this.value)"><button class="s" onclick="del('sells','${r.id}',this)">Löschen</button></div>`).join(""):`<div class="c mu">Noch kein Verkauf erfasst.</div>`)}
+function addSl(){const x={id:uid(),stock:v("sn").trim(),date:v("sd"),qty:num(v("sq")),price:num(v("sp")),fee:num(v("sf"))||0,tx:v("sx").trim()===""?null:num(v("sx"))};
+ if(!x.stock||!x.date||!(x.qty>0)||isNaN(x.price))return msg("Bitte Aktie, Datum, Stückzahl und Kurs ausfüllen.");
+ S.sells.push(x);if(C().res.find(r=>r.id==x.id).over){S.sells.pop();return msg("Das sind mehr Stück, als zu diesem Datum im Bestand sind. Erfasse zuerst die Käufe.")}
+ save();R()}
+function ov(id,x){const s=S.sells.find(s=>s.id==id);x=String(x).trim();s.tx=x===""||isNaN(num(x))?null:num(x);save();R()}
+function del(t,id,b){if(!b.dataset.c){b.dataset.c=1;b.textContent="Wirklich löschen?";return}S[t]=S[t].filter(x=>x.id!=id);save();R()}
+
+function vBy(){
+ return `<div class="c"><h2 style="margin-top:0">Kauf erfassen</h2><label>Aktie</label><input id="bn" list="nl">${dl()}<label>Kaufdatum</label><input id="bd" type="date" value="${today()}"><label>Stück</label><input id="bq" inputmode="decimal"><label>Eingabe</label><select id="bm" onchange="$('#bk').style.display=this.value=='k'?'':'none';$('#bg').style.display=this.value=='t'?'':'none'"><option value="k">Kurs und Gebühr getrennt</option><option value="t">Gesamtkosten inkl. Gebühren</option></select><div id="bk" class="g"><div><label>Kurs (€)</label><input id="bp" inputmode="decimal"></div><div><label>Gebühr (€)</label><input id="bf" inputmode="decimal"></div></div><div id="bg" style="display:none"><label>Gesamtkosten (€)</label><input id="bt" inputmode="decimal"></div><button onclick="addBy()">Kauf speichern</button><div id="m" class="n"></div></div>`
+ +(S.buys.length?[...S.buys].sort((a,b)=>b.date.localeCompare(a.date)).map(b=>`<div class="c"><b>${esc(b.stock)}</b> <span class="mu">${D(b.date)}, ${nf(b.qty)} Stk.</span><div class="g" style="margin-top:8px"><div><div class="k">Gesamtkosten</div><div class="v">${f(b.total)}</div></div><div><div class="k">Pro Stück inkl. Gebühr</div><div class="v">${f(b.total/b.qty)}</div></div></div><button class="s" onclick="del('buys','${b.id}',this)">Löschen</button></div>`).join(""):`<div class="c mu">Noch kein Kauf erfasst.</div>`)}
+function addBy(){const q=num(v("bq")),t=v("bm")=="t"?num(v("bt")):q*num(v("bp"))+(num(v("bf"))||0),x={id:uid(),stock:v("bn").trim(),date:v("bd"),qty:q,total:t};
+ if(!x.stock||!x.date||!(q>0)||!(t>=0))return msg("Bitte Aktie, Datum, Stückzahl und Kosten ausfüllen.");
+ S.buys.push(x);save();R()}
+
+function vSt(){const{res}=C(),ys=[...new Set(res.map(r=>r.date.slice(0,4)).concat(today().slice(0,4)))].sort();
+ return `<div class="c"><h2 style="margin-top:0">Steuer</h2><label>Kirchensteuer (%, 0 = keine)</label><input inputmode="decimal" value="${nf(S.set.church)}" onchange="S.set.church=num(this.value)||0;save();R()"><label>Verlustvortrag zum Start (€)</label><input inputmode="decimal" value="${nf(S.set.carry)}" onchange="S.set.carry=num(this.value)||0;save();R()"><div class="k" style="margin:6px 0">Verfügbarer Freibetrag je Jahr (€)</div><div class="g">${ys.map(y=>`<div><label>${y}</label><input inputmode="decimal" value="${nf(S.set.al[y]!=null?S.set.al[y]:1000)}" onchange="S.set.al['${y}']=num(this.value)||0;save();R()"></div>`).join("")}</div><p class="mu">Satz: 25 % plus 5,5 % Soli, bei Kirchensteuer entsprechend angepasst. Verluste werden nur mit Gewinnen verrechnet. Trage beim Freibetrag den Rest ein, der noch verfügbar ist.</p></div>
+ <div class="c"><h2 style="margin-top:0">Sicherheit</h2><label>Neuer Code (mindestens 6 Zeichen)</label><input id="nc" type="password"><button onclick="chg()">Code ändern</button> <button class="s" onclick="lock()">Jetzt sperren</button><div id="m" class="n"></div></div>
+ <div class="c"><h2 style="margin-top:0">Export und Import</h2><button onclick="ex()">Verschlüsselten Export erzeugen</button><textarea id="ex" rows="4" readonly placeholder="Text kopieren und sicher aufbewahren"></textarea><label>Export einfügen</label><textarea id="im" rows="3"></textarea><label>Code des Exports</label><input id="ic" type="password"><button onclick="imp()">Importieren</button><div id="m2" class="n"></div><p class="mu">Ein Import ersetzt alle aktuellen Daten.</p></div>
+ <div class="c"><button class="s" onclick="rs2(this)">Alle Daten löschen</button></div>`}
+async function chg(){const p=v("nc");if(p.length<6)return msg("Mindestens 6 Zeichen.");salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(p,salt);await save();$("#nc").value="";msg("Code geändert.")}
+async function ex(){$("#ex").value=await seal(key,salt,S)}
+async function imp(){try{const b=v("im").trim(),o=JSON.parse(b),k=await derive(v("ic"),ub(o.s));S=await open(k,b);await save();tab="ov";R()}catch(e){$("#m2").textContent="Import fehlgeschlagen: Text oder Code stimmt nicht."}}
+function rs2(b){if(!b.dataset.c){b.dataset.c=1;b.textContent="Wirklich alles löschen?";return}try{localStorage.removeItem(K)}catch(e){}S=null;key=null;R()}
+R();
+</script></body></html>
