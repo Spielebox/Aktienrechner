@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gewinnbuch</title>
+<link rel="icon" id="fi" href="data:,"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-title" content="Gewinnbuch">
+<style>
+:root{--bg:#eceff0;--card:#fbfcfc;--tx:#14232b;--mu:#5d6c73;--ln:#d3dbde;--ac:#0f5c63;--bt:#fff;--ok:#1d7a46;--bad:#b3261e;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1f;--card:#17262c;--tx:#e4ecee;--mu:#8ea1a8;--ln:#2a3d45;--ac:#5cc2c9;--bt:#07272a;--ok:#58c987;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a1f;--card:#17262c;--tx:#e4ecee;--mu:#8ea1a8;--ln:#2a3d45;--ac:#5cc2c9;--bt:#07272a;--ok:#58c987;--bad:#ff8a80;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{max-width:720px;margin:0 auto;padding:14px}
+h1,h2{font-family:Georgia,"Iowan Old Style",serif;font-weight:600}
+h1{font-size:24px;margin:6px 0 12px}h2{font-size:17px;margin:20px 0 8px}
+.c{background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:12px;margin:8px 0}
+.mu,.k{color:var(--mu);font-size:13px}
+.v{font-family:Georgia,serif;font-size:17px;font-variant-numeric:tabular-nums}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+button,input,select,textarea{font:inherit;color:var(--tx)}
+button{background:var(--ac);color:var(--bt);border:0;border-radius:8px;padding:10px 14px;margin-top:4px}
+button.s,.tabs button{background:var(--card);color:var(--tx);border:1px solid var(--ln)}
+.tabs button{padding:8px 12px;white-space:nowrap;margin:0}
+.tabs button.on{background:var(--ac);color:var(--bt);border-color:var(--ac)}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:10px;margin:3px 0 8px}
+label{font-size:13px;color:var(--mu)}
+input[type="date"]{display:block;min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;min-height:44px;text-align:left}
+.g>div{min-width:0}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
+.p{color:var(--ok)}.n{color:var(--bad)}
+.w{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 4px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}
+th{color:var(--mu);font-weight:400}th:first-child,td:first-child{text-align:left}
+a{color:var(--ac)}
+</style></head><body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),K="aktien_v1",v=i=>$("#"+i).value;
+const LOGO="data:image/png;base64,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";
+const HD=`<h1><img src="${LOGO}" alt="" width="36" height="36" style="vertical-align:-9px;margin-right:10px;border-radius:8px">Gewinnbuch</h1>`;document.getElementById("fi").href=LOGO;
+const VER="1.4",VF=`<p class="mu" style="text-align:center;margin-top:18px">Gewinnbuch · Version ${VER}</p>`;
+let S=null,key=null,salt=null,tab="ov",timer,hid=0;
+const te=new TextEncoder(),td=new TextDecoder();
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))),ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const ld=()=>{try{return localStorage.getItem(K)}catch(e){return null}};
+async function derive(p,s){const m=await crypto.subtle.importKey("raw",te.encode(p),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:300000,hash:"SHA-256"},m,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function seal(k,s,o){const iv=crypto.getRandomValues(new Uint8Array(12));const c=await crypto.subtle.encrypt({name:"AES-GCM",iv},k,te.encode(JSON.stringify(o)));return JSON.stringify({v:1,s:b64(s),i:b64(iv),d:b64(c)})}
+async function open(k,blob){const o=JSON.parse(blob);return JSON.parse(td.decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(o.i)},k,ub(o.d))))}
+async function save(){try{localStorage.setItem(K,await seal(key,salt,S))}catch(e){msg("Speichern nicht möglich.")}}
+function msg(t){const m=$("#m");if(m)m.textContent=t}
+function lock(){S=null;key=null;R()}
+function touch(){clearTimeout(timer);timer=setTimeout(lock,300000)}
+["click","keydown","touchstart"].forEach(e=>addEventListener(e,()=>{if(S)touch()},{passive:true}));
+document.addEventListener("visibilitychange",()=>{if(document.hidden)hid=Date.now();else if(S&&Date.now()-hid>60000)lock()});
+
+const num=x=>parseFloat(String(x).replace(",",".")),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const f=n=>(Math.abs(n)<.005?0:n).toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+const nf=n=>String(n).replace(".",","),D=d=>d.split("-").reverse().join("."),cl=n=>n>=0?"p":"n";
+const today=()=>new Date().toISOString().slice(0,10),days=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/864e5);
+const H=d=>d<100?Math.round(d)+" Tage":d<730?Math.round(d/30.44)+" Mon.":(d/365.25).toFixed(1).replace(".",",")+" Jahre";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sm=(a,k)=>a.reduce((x,r)=>x+r[k],0);
+
+function C(){
+ const ev=[...S.buys.map(b=>({...b,t:"b"})),...S.sells.map(s=>({...s,t:"s"}))].sort((a,b)=>a.date.localeCompare(b.date)||(a.t==b.t?0:a.t=="b"?-1:1));
+ const lots={},res=[];
+ for(const e of ev){const L=lots[e.stock]=lots[e.stock]||[];
+  if(e.t=="b"){L.push({d:e.date,q:e.qty,c:e.total/e.qty});continue}
+  let need=e.qty,cost=0,dd=0;
+  while(need>1e-9&&L.length){const l=L[0],q=Math.min(l.q,need);cost+=q*l.c;dd+=q*days(l.d,e.date);l.q-=q;need-=q;if(l.q<=1e-9)L.shift()}
+  const gross=e.qty*e.price-cost;
+  res.push({...e,cost,gross,net0:gross-e.fee,hold:dd/e.qty,over:need>1e-9})}
+ const k=(+S.set.church||0)/100,rate=.25/(1+.25*k)*(1.055+k);
+ let carry=+S.set.carry||0;const Y={};
+ for(const y of [...new Set(res.map(r=>r.date.slice(0,4)))].sort()){
+  const al=S.set.al[y]!=null?+S.set.al[y]:1000;let run=-carry,pt=0;
+  for(const r of res.filter(r=>r.date.slice(0,4)==y)){run+=r.net0;const cu=Math.max(0,run-al)*rate;r.tc=cu-pt;pt=cu}
+  Y[y]={al,used:Math.min(al,Math.max(0,run)),carry:Math.max(0,-run)};carry=Math.max(0,-run)}
+ for(const r of res){r.tax=r.tx!=null?r.tx:r.tc;r.after=r.net0-r.tax}
+ return{res,lots,Y}}
+
+function lockHTML(){const h=ld(),K2='onkeydown="if(event.keyCode==13)go()"';
+ return `${HD}<div class="c"><label>${h?"Code eingeben":"Code festlegen (mindestens 6 Zeichen)"}</label><input id="pw" type="password" autocomplete="off" ${K2}>${h?"":`<label>Code wiederholen</label><input id="pw2" type="password" ${K2}>`}<button onclick="go()">${h?"Entsperren":"Code festlegen"}</button><div id="m" class="n"></div><p class="mu">Die Daten liegen verschlüsselt nur auf diesem Gerät. Ohne den Code ist keine Wiederherstellung möglich – sichere deshalb regelmäßig einen Export.</p></div>${h?`<p class="mu"><a href="#" onclick="return rs(this)">Alle Daten zurücksetzen</a></p>`:""}`}
+function rs(a){if(!a.dataset.c){a.dataset.c=1;a.textContent="Wirklich alles löschen? Nochmal tippen.";return false}try{localStorage.removeItem(K)}catch(e){}S=null;key=null;R();return false}
+async function go(){const h=ld(),p=v("pw");
+ try{
+  if(!h){if(p.length<6)return msg("Der Code braucht mindestens 6 Zeichen.");if(p!==v("pw2"))return msg("Die Codes stimmen nicht überein.");
+   salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(p,salt);S={buys:[],sells:[],sim:[],set:{church:0,al:{},carry:0}};await save()}
+  else{const o=JSON.parse(h);salt=ub(o.s);const k=await derive(p,salt);try{S=await open(k,h);S.sim=S.sim||[];key=k}catch(e){return msg("Falscher Code.")}}
+ }catch(e){return msg("Verschlüsselung nicht verfügbar. Öffne die Seite über https.")}
+ tab="ov";touch();R()}
+
+function R(){const a=$("#app");if(!S){a.innerHTML=lockHTML()+VF;return}
+ a.innerHTML=`${HD}<div class="tabs">${[["ov","Übersicht"],["by","Kauf"],["sl","Verkauf"],["vl","Verlauf"],["yr","Jahre"],["si","Simulation"],["st","Einstellungen"]].map(([k,t])=>`<button class="${tab==k?"on":""}" onclick="tab='${k}';R()">${t}</button>`).join("")}</div>`+({ov:vOv,vl:vVl,yr:vYr,si:vSi,sl:vSl,by:vBy,st:vSt})[tab]()+VF}
+
+const kv=a=>`<div class="g" style="margin-top:8px">${a.map(([k,x,c])=>`<div><div class="k">${k}</div><div class="v ${c||""}">${x}</div></div>`).join("")}</div>`;
+const pct=x=>x==null||isNaN(x)?"–":(x*100).toLocaleString("de-DE",{maximumFractionDigits:1})+" %";
+const rg=a=>{const c=sm(a,"cost");return c>0?sm(a,"gross")/c:null},rn=a=>{const c=sm(a,"cost");return c>0?sm(a,"after")/c:null};
+const pa=a=>{a=a.filter(r=>r.hold>=30&&r.cost>0);const d=a.reduce((x,r)=>x+r.cost*r.hold/365.25,0);return d>0?sm(a,"gross")/d:null};
+const own=()=>{const{lots}=C();return Object.keys(lots).filter(n=>sm(lots[n],"q")>1e-9).sort()};
+const hq=n=>{const L=C().lots[n]||[],q=sm(L,"q");return{q,c:q>1e-9?L.reduce((x,l)=>x+l.q*l.c,0)/q:0}};
+const stats=r=>kv([["Brutto",f(r.gross),cl(r.gross)],["Netto",f(r.after),cl(r.after)],["Steuer",f(r.tax)],["Haltedauer",H(r.hold)],["Rendite brutto",pct(rg([r]))],["Rendite netto",pct(rn([r]))],["Rendite p. a.",pct(pa([r]))]]);
+const bars=(rows,leg)=>{const m=Math.max(1,...rows.flatMap(r=>r[1].map(x=>Math.abs(x))));return`<div class="c">${rows.map(([l,vs])=>`<div class="k" style="margin-top:6px">${esc(l)}</div>${vs.map((x,i)=>`<div style="display:flex;align-items:center;gap:6px"><div style="height:10px;border-radius:3px;background:${x>=0?"var(--ok)":"var(--bad)"};opacity:${vs.length>1&&!i?.45:1};width:${Math.max(1,Math.abs(x)/m*70)}%"></div><span class="k">${f(x)}</span></div>`).join("")}`).join("")}<div class="k" style="margin-top:8px">${leg}</div></div>`};
+function lc(ss,t0,t1){const all=ss.flatMap(s=>s.p.map(p=>p[1])).concat(0),mn=Math.min(...all),mx=Math.max(...all),X=t=>t1>t0?56+(t-t0)/(t1-t0)*276:194,Y=y=>mx>mn?130-(y-mn)/(mx-mn)*120:70,e=n=>Math.round(n).toLocaleString("de-DE")+" €",dd=t=>D(new Date(t).toISOString().slice(0,10)),tx=(x,a,t)=>`<text x="${x}" y="152" text-anchor="${a}" font-size="10" fill="var(--mu)">${t}</text>`;
+ return`<svg viewBox="0 0 340 158" width="100%" role="img" aria-label="Verlauf">${[...new Set([mx,0,mn])].map(y=>`<line x1="56" x2="332" y1="${Y(y)}" y2="${Y(y)}" stroke="var(--ln)" ${y?"":'stroke-dasharray="4 3"'}/><text x="52" y="${Y(y)+3}" text-anchor="end" font-size="10" fill="var(--mu)">${e(y)}</text>`).join("")}${tx(56,"start",dd(t0))}${t1>t0?tx(194,"middle",dd(t0+(t1-t0)/2))+tx(332,"end",dd(t1)):""}${ss.map(s=>`<polyline points="${s.p.map(p=>X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" ")}" fill="none" stroke="${s.c}" stroke-width="2"/>`).join("")}</svg><div class="k">${ss.map(s=>`<span style="color:${s.c}">▬</span> ${s.n} ${f(s.p[s.p.length-1][1])}`).join(" &nbsp; ")}</div>`}
+
+function vOv(){const{res,lots}=C();
+ if(!res.length&&!S.buys.length)return`<div class="c">Noch keine Einträge. Erfasse zuerst einen Kauf, danach den Verkauf.</div>`;
+ const names=[...new Set(S.buys.map(b=>b.stock).concat(res.map(r=>r.stock)))].sort(),bound=n=>(lots[n]||[]).reduce((x,l)=>x+l.q*l.c,0),inv=n=>sm(S.buys.filter(b=>b.stock==n),"total"),tt=sm(S.buys,"total"),tb=names.reduce((x,n)=>x+bound(n),0);
+ return`<div class="c">${kv([["Investiert gesamt",f(tt)],["Aktuell gebunden",f(tb)],["Brutto-Gewinn",f(sm(res,"gross")),cl(sm(res,"gross"))],["Gebühren (Verkauf)",f(sm(res,"fee"))],["Steuern",f(sm(res,"tax"))],["Netto",f(sm(res,"after")),cl(sm(res,"after"))],["Rendite brutto",pct(rg(res))],["Rendite p. a.",pct(pa(res))]])}</div><h2>Je Aktie</h2><div class="c w"><table><tr><th>Aktie</th><th>Seit</th><th>Investiert</th><th>Gebunden</th><th>Brutto real.</th><th>Netto real.</th><th>Rendite</th></tr>${names.map(n=>{const a=res.filter(r=>r.stock==n),first=S.buys.filter(b=>b.stock==n).map(b=>b.date).sort()[0];return`<tr><td>${esc(n)}</td><td>${first?D(first):"–"}</td><td>${f(inv(n))}</td><td>${f(bound(n))}</td><td class="${cl(sm(a,"gross"))}">${a.length?f(sm(a,"gross")):"–"}</td><td>${a.length?f(sm(a,"after")):"–"}</td><td>${pct(rg(a))}</td></tr>`}).join("")}<tr><td><b>Summe</b></td><td></td><td>${f(tt)}</td><td>${f(tb)}</td><td>${f(sm(res,"gross"))}</td><td>${f(sm(res,"after"))}</td><td>${pct(rg(res))}</td></tr></table></div><p class="mu">Rendite = Gewinn ÷ Einstandskosten der verkauften Stück. „p. a.“ rechnet auf ein Jahr hoch und berücksichtigt nur Verkäufe mit mindestens 30 Tagen Haltedauer.</p>`}
+
+let vy="all";
+function vVl(){const{res}=C();if(!res.length&&!S.buys.length)return`<div class="c">Noch keine Daten.</div>`;
+ const pts=[...S.buys.map(b=>({d:b.date,k:b.total,g:0,n:0})),...res.map(r=>({d:r.date,k:-r.cost,g:r.gross,n:r.after}))].sort((a,b)=>a.d.localeCompare(b.d)),ys=[...new Set(pts.map(p=>p.d.slice(0,4)))].sort();
+ if(vy!="all"&&!ys.includes(vy))vy="all";
+ let k=0,g=0,n=0;const A=pts.map(p=>({y:p.d.slice(0,4),t:Date.parse(p.d),k:k+=p.k,g:g+=p.g,n:n+=p.n}));
+ let L=A,z={k:0,g:0,n:0};
+ if(vy!="all"){const pre=A.filter(a=>a.y<vy);if(pre.length)z=pre[pre.length-1];L=[{t:Date.parse(vy+"-01-01"),k:z.k,g:z.g,n:z.n},...A.filter(a=>a.y==vy)]}
+ const s=(key,nm,c,o)=>({n:nm,c,p:L.map(a=>[a.t,a[key]-(o?z[key]:0)])}),dy=[...new Set(res.map(r=>r.date.slice(0,4)))].sort();
+ return`<div class="c"><label>Zeitraum</label><select onchange="vy=this.value;R()">${["all",...ys].map(y=>`<option value="${y}"${y==vy?" selected":""}>${y=="all"?"Gesamte Laufzeit":y}</option>`).join("")}</select>${lc([s("k","Gebunden","var(--mu)",0),s("g","Brutto","var(--ac)",1),s("n","Netto","var(--ok)",1)],L[0].t,L[L.length-1].t)}</div>`
+ +(dy.length?`<h2>Gewinn je Jahr</h2>`+bars(dy.map(y=>{const a=res.filter(r=>r.date.slice(0,4)==y);return[y,[sm(a,"gross"),sm(a,"after")]]}),"Hell: brutto, kräftig: netto nach Steuern"):"")
+ +(res.length?`<h2>Gewinn je Aktie</h2>`+bars([...new Set(res.map(r=>r.stock))].sort().map(n=>[n,[sm(res.filter(r=>r.stock==n),"gross")]]),"Brutto realisiert"):"")}
+
+function vYr(){const{res,Y}=C(),ys=Object.keys(Y).sort().reverse();
+ return(ys.length?ys.map(y=>{const a=res.filter(r=>r.date.slice(0,4)==y),q=Y[y];return`<div class="c"><h2 style="margin:0">${y}</h2>${kv([["Brutto",f(sm(a,"gross")),cl(sm(a,"gross"))],["Gebühren",f(sm(a,"fee"))],["Steuer",f(sm(a,"tax"))],["Netto",f(sm(a,"after")),cl(sm(a,"after"))],["Verkäufe",a.length],["Freibetrag genutzt",f(q.used)+" von "+f(q.al)],["Verlustvortrag ins Folgejahr",f(q.carry)],["Rendite brutto",pct(rg(a))],["Rendite netto",pct(rn(a))],["Rendite p. a.",pct(pa(a))]])}</div>`}).join(""):`<div class="c mu">Noch keine Verkäufe.</div>`)+`<p class="mu">Jahreswerte werden immer live aus deinen Verkäufen berechnet.</p>`}
+
+const sel=()=>($("#sn")||{}).value||"";
+const sfm=()=>{const o=own();return`${o.length?`<label>Aktie</label><select id="sn">${o.map(n=>{const h=hq(n);return`<option value="${esc(n)}">${esc(n)} (Bestand ${nf(+h.q.toFixed(4))}, Ø ${f(h.c)})</option>`}).join("")}</select>`:`<p class="mu">Kein Bestand. Erfasse zuerst einen Kauf.</p>`}<label>Datum</label><input id="sd" type="date" value="${today()}"><div class="g"><div><label>Stück</label><input id="sq" inputmode="decimal"></div><div><label>Kurs (€)</label><input id="sp" inputmode="decimal"></div><div><label>Gebühr (€)</label><input id="sf" inputmode="decimal"></div></div><button class="s" onclick="all_()">Alle Stück</button>`};
+const all_=()=>{const n=sel();if(n)$("#sq").value=nf(+hq(n).q.toFixed(4))};
+const rd=()=>({id:uid(),stock:sel(),date:v("sd"),qty:num(v("sq")),price:num(v("sp")),fee:num(v("sf"))||0}),ok=x=>x.stock&&x.date&&x.qty>0&&!isNaN(x.price);
+function vSl(){const{res}=C();
+ return`<div class="c"><h2 style="margin-top:0">Verkauf erfassen</h2>${sfm()}<label style="display:block">Steuer abweichend (optional, leer = berechnet)</label><input id="sx" inputmode="decimal"><button onclick="addSl()">Verkauf speichern</button><div id="m" class="n"></div></div>`
+ +(res.length?[...res].reverse().map(r=>`<div class="c"><b>${esc(r.stock)}</b> <span class="mu">${D(r.date)}, ${nf(r.qty)} Stk. zu ${f(r.price)}</span>${r.over?`<div class="n">Mehr verkauft als im Bestand. Prüfe die Käufe.</div>`:""}${stats(r)}<label style="display:block;margin-top:8px">Steuer überschreiben (berechnet: ${f(r.tc)})</label><input inputmode="decimal" value="${r.tx==null?"":nf(r.tx)}" onchange="ov('${r.id}',this.value)"><button class="s" onclick="del('sells','${r.id}',this)">Löschen</button></div>`).join(""):`<div class="c mu">Noch kein Verkauf erfasst.</div>`)}
+function addSl(){const x={...rd(),tx:v("sx").trim()===""?null:num(v("sx"))};
+ if(!ok(x))return msg("Bitte Aktie, Datum, Stückzahl und Kurs ausfüllen.");
+ S.sells.push(x);if(C().res.find(r=>r.id==x.id).over){S.sells.pop();return msg("Das sind mehr Stück, als zu diesem Datum im Bestand sind. Erfasse zuerst die Käufe.")}
+ save();R()}
+function ov(id,x){const s=S.sells.find(s=>s.id==id);x=String(x).trim();s.tx=x===""||isNaN(num(x))?null:num(x);save();R()}
+function del(t,id,b){if(!b.dataset.c){b.dataset.c=1;b.textContent="Wirklich löschen?";return}S[t]=S[t].filter(x=>x.id!=id);save();R()}
+function simr(x){S.sells.push({...x,tx:null});const r=C().res.find(r=>r.id==x.id);S.sells.pop();return r}
+function vSi(){
+ return`<div class="c"><h2 style="margin-top:0">Verkauf simulieren</h2>${sfm()}<button onclick="addSi()">Simulation speichern</button><div id="m" class="n"></div><p class="mu">Simulationen beeinflussen deine echten Zahlen nicht. Jede wird einzeln gegen deinen aktuellen Stand gerechnet.</p></div>`
+ +(S.sim.length?S.sim.map(x=>{const r=simr(x);return`<div class="c"><b>${esc(x.stock)}</b> <span class="mu">${D(x.date)}, ${nf(x.qty)} Stk. zu ${f(x.price)}</span>${r.over?`<div class="n">Mehr als im Bestand.</div>`:""}${stats(r)}<button onclick="adopt('${x.id}')">Als Verkauf übernehmen</button> <button class="s" onclick="del('sim','${x.id}',this)">Löschen</button></div>`}).join(""):`<div class="c mu">Noch keine Simulation gespeichert.</div>`)}
+function addSi(){const x=rd();if(!ok(x))return msg("Bitte Aktie, Datum, Stückzahl und Kurs ausfüllen.");S.sim.push(x);save();R()}
+function adopt(id){const x=S.sim.find(s=>s.id==id);S.sells.push({...x,tx:null});if(C().res.find(r=>r.id==id).over){S.sells.pop();return msg("Mehr Stück als im Bestand.")}S.sim=S.sim.filter(s=>s.id!=id);save();R()}
+
+function vBy(){const n=[...new Set(S.buys.map(b=>b.stock))].sort();
+ return `<div class="c"><h2 style="margin-top:0">Kauf erfassen</h2><label>Aktie</label><select id="bn" onchange="$('#bnn').style.display=this.value=='__n'?'':'none'">${n.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}<option value="__n">Neue Aktie …</option></select><input id="bnn" placeholder="Name der Aktie" style="display:${n.length?"none":""}"><label>Kaufdatum</label><input id="bd" type="date" value="${today()}"><label>Stück</label><input id="bq" inputmode="decimal"><label>Eingabe</label><select id="bm" onchange="$('#bk').style.display=this.value=='k'?'':'none';$('#bg').style.display=this.value=='t'?'':'none'"><option value="k">Kurs und Gebühr getrennt</option><option value="t">Gesamtkosten inkl. Gebühren</option></select><div id="bk" class="g"><div><label>Kurs (€)</label><input id="bp" inputmode="decimal"></div><div><label>Gebühr (€)</label><input id="bf" inputmode="decimal"></div></div><div id="bg" style="display:none"><label>Gesamtkosten (€)</label><input id="bt" inputmode="decimal"></div><button onclick="addBy()">Kauf speichern</button><div id="m" class="n"></div></div>`
+ +(S.buys.length?[...S.buys].sort((a,b)=>b.date.localeCompare(a.date)).map(b=>`<div class="c"><b>${esc(b.stock)}</b> <span class="mu">${D(b.date)}, ${nf(b.qty)} Stk.</span>${kv([["Gesamtkosten",f(b.total)],["Pro Stück inkl. Gebühr",f(b.total/b.qty)]])}<button class="s" onclick="del('buys','${b.id}',this)">Löschen</button></div>`).join(""):`<div class="c mu">Noch kein Kauf erfasst.</div>`)}
+function addBy(){const q=num(v("bq")),t=v("bm")=="t"?num(v("bt")):q*num(v("bp"))+(num(v("bf"))||0),x={id:uid(),stock:v("bn")=="__n"?v("bnn").trim():v("bn"),date:v("bd"),qty:q,total:t};
+ if(!x.stock||!x.date||!(q>0)||!(t>=0))return msg("Bitte Aktie, Datum, Stückzahl und Kosten ausfüllen.");
+ S.buys.push(x);save();R()}
+
+function vSt(){const{res}=C(),ys=[...new Set(res.map(r=>r.date.slice(0,4)).concat(today().slice(0,4)))].sort();
+ return `<div class="c"><h2 style="margin-top:0">Steuer</h2><label>Kirchensteuer (%, 0 = keine)</label><div class="mu" style="margin-bottom:4px">Hinweis: 8 % in Bayern und Baden-Württemberg, 9 % in allen anderen Bundesländern.</div><input inputmode="decimal" value="${nf(S.set.church)}" onchange="S.set.church=num(this.value)||0;save();R()"><label>Verlustvortrag zum Start (€)</label><input inputmode="decimal" value="${nf(S.set.carry)}" onchange="S.set.carry=num(this.value)||0;save();R()"><div class="k" style="margin:6px 0">Verfügbarer Freibetrag je Jahr (€)</div><div class="g">${ys.map(y=>`<div><label>${y}</label><input inputmode="decimal" value="${nf(S.set.al[y]!=null?S.set.al[y]:1000)}" onchange="S.set.al['${y}']=num(this.value)||0;save();R()"></div>`).join("")}</div><p class="mu">Satz: 25 % plus 5,5 % Soli, bei Kirchensteuer entsprechend angepasst. Verluste werden nur mit Gewinnen verrechnet. Trage beim Freibetrag den Rest ein, der noch verfügbar ist.</p></div>
+ <div class="c"><h2 style="margin-top:0">Sicherheit</h2><label>Neuer Code (mindestens 6 Zeichen)</label><input id="nc" type="password"><button onclick="chg()">Code ändern</button> <button class="s" onclick="lock()">Jetzt sperren</button><div id="m" class="n"></div></div>
+ <div class="c"><h2 style="margin-top:0">Export und Import</h2><button onclick="ex()">Verschlüsselten Export erzeugen</button><textarea id="ex" rows="4" readonly placeholder="Text kopieren und sicher aufbewahren"></textarea><label>Export einfügen</label><textarea id="im" rows="3"></textarea><label>Code des Exports</label><input id="ic" type="password"><button onclick="imp()">Importieren</button><div id="m2" class="n"></div><p class="mu">Ein Import ersetzt alle aktuellen Daten.</p></div>
+ <div class="c"><button class="s" onclick="rs2(this)">Alle Daten löschen</button></div>`}
+async function chg(){const p=v("nc");if(p.length<6)return msg("Mindestens 6 Zeichen.");salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(p,salt);await save();$("#nc").value="";msg("Code geändert.")}
+async function ex(){$("#ex").value=await seal(key,salt,S)}
+async function imp(){try{const b=v("im").trim(),o=JSON.parse(b),k=await derive(v("ic"),ub(o.s));S=await open(k,b);S.sim=S.sim||[];await save();tab="ov";R()}catch(e){$("#m2").textContent="Import fehlgeschlagen: Text oder Code stimmt nicht."}}
+function rs2(b){if(!b.dataset.c){b.dataset.c=1;b.textContent="Wirklich alles löschen?";return}try{localStorage.removeItem(K)}catch(e){}S=null;key=null;R()}
+R();
+</script></body></html>
